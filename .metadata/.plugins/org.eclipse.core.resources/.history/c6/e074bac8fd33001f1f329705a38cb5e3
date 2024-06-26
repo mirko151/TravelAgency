@@ -1,0 +1,5 @@
+package com.travelagency.repository;
+
+public class UserRepository {
+
+}

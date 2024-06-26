@@ -1,0 +1,14 @@
+package com.travelagency.repository;
+
+import com.travelagency.model.Travel;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface TravelRepository extends JpaRepository<Travel, Integer> {
+    List<Travel> findByCategoryName(String categoryName);
+    List<Travel> findByDestinationName(String destinationName);
+    // Dodajte dodatne metode za pretragu po potrebnim parametrima
+}

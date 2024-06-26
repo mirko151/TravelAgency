@@ -1,0 +1,5 @@
+package com.travelagency.models;
+
+public class User {
+
+}
