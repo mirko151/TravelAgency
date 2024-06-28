@@ -1,0 +1,57 @@
+package com.travelagency.service;
+
+import com.travelagency.model.Travel;
+import com.travelagency.model.TransportMode;
+import com.travelagency.model.Accommodation;
+import com.travelagency.repository.TravelRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Service
+public class TravelService {
+    @Autowired
+    private TravelRepository travelRepository;
+
+    public Travel saveTravel(Travel travel) {
+        return travelRepository.save(travel);
+    }
+
+    public Travel getTravelById(int id) {
+        return travelRepository.findById(id).orElse(null);
+    }
+
+    public List<Travel> getAllTravels() {
+        return travelRepository.findAll();
+    }
+
+    public void deleteTravel(int id) {
+        travelRepository.deleteById(id);
+    }
+
+    public List<Travel> findTravelsByCategoryName(String categoryName) {
+        return travelRepository.findByCategoryName(categoryName);
+    }
+
+    public List<Travel> findTravelsByDestinationName(String destinationName) {
+        return travelRepository.findByDestinationName(destinationName);
+    }
+
+    public List<Travel> findTravelsByTransportMode(TransportMode transportMode) {
+        return travelRepository.findByTransportMode(transportMode);
+    }
+
+    public List<Travel> findTravelsByAccommodation(Accommodation accommodation) {
+        return travelRepository.findByAccommodation(accommodation);
+    }
+
+    public List<Travel> findTravelsByNights(int nights) {
+        return travelRepository.findByNights(nights);
+    }
+
+    public List<Travel> findTravelsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
+        return travelRepository.findByPriceBetween(minPrice, maxPrice);
+    }
+}

@@ -1,13 +1,16 @@
 package com.travelagency.service;
 
 import com.travelagency.model.Travel;
-import com.travelagency.model.TransportMode;
-import com.travelagency.model.Accommodation;
 import com.travelagency.repository.TravelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -31,27 +34,11 @@ public class TravelService {
         travelRepository.deleteById(id);
     }
 
-    public List<Travel> findTravelsByCategoryName(String categoryName) {
-        return travelRepository.findByCategoryName(categoryName);
-    }
-
-    public List<Travel> findTravelsByDestinationName(String destinationName) {
-        return travelRepository.findByDestinationName(destinationName);
-    }
-
-    public List<Travel> findTravelsByTransportMode(TransportMode transportMode) {
-        return travelRepository.findByTransportMode(transportMode);
-    }
-
-    public List<Travel> findTravelsByAccommodation(Accommodation accommodation) {
-        return travelRepository.findByAccommodation(accommodation);
-    }
-
-    public List<Travel> findTravelsByNights(int nights) {
-        return travelRepository.findByNights(nights);
-    }
-
-    public List<Travel> findTravelsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
-        return travelRepository.findByPriceBetween(minPrice, maxPrice);
+    public String saveImage(MultipartFile image) throws IOException {
+        String folder = "uploads/";
+        byte[] bytes = image.getBytes();
+        Path path = Paths.get(folder + image.getOriginalFilename());
+        Files.write(path, bytes);
+        return path.toString();
     }
 }

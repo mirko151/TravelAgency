@@ -1,0 +1,5 @@
+package com.travelagency.config;
+
+public class SecurityConfig {
+
+}
