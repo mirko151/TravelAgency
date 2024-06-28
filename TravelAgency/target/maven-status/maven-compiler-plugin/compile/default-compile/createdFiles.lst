@@ -1,0 +1,16 @@
+com/travelagency/controller/UserController.class
+com/travelagency/repository/ReservationRepository.class
+com/travelagency/model/TransportMode.class
+com/travelagency/model/User.class
+com/travelagency/model/Travel.class
+com/travelagency/service/TravelService.class
+com/travelagency/service/ReservationService.class
+com/travelagency/repository/UserRepository.class
+com/travelagency/repository/TravelRepository.class
+com/travelagency/controller/TravelController.class
+com/travelagency/service/UserService.class
+com/travelagency/model/Reservation.class
+com/travelagency/model/Role.class
+com/travelagency/config/SecurityConfig.class
+com/travelagency/model/TravelCategory.class
+com/travelagency/model/Accommodation.class

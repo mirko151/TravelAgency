@@ -1,8 +1,8 @@
 package com.travelagency.controller;
 
-import com.travelagency.model.Reservation;
 import com.travelagency.model.Travel;
-import com.travelagency.service.ReservationService;
+import com.travelagency.model.TransportMode;
+import com.travelagency.model.Accommodation;
 import com.travelagency.service.TravelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,17 +11,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Controller
 @RequestMapping("/travel")
 public class TravelController {
-    @Autowired
-    private TravelService travelService;
 
     @Autowired
-    private ReservationService reservationService;
+    private TravelService travelService;
 
     @GetMapping("/all")
     public String listAllTravels(Model model) {
@@ -39,14 +36,11 @@ public class TravelController {
     }
 
     @PostMapping("/add")
-    public String addTravel(@ModelAttribute("travel") Travel travel, BindingResult result, @RequestParam("image") MultipartFile image) throws IOException {
+    public String addTravel(@ModelAttribute("travel") Travel travel, BindingResult result, @RequestParam("image") MultipartFile image) {
         if (result.hasErrors()) {
             return "add-travel";
         }
-        if (!image.isEmpty()) {
-            String imagePath = travelService.saveImage(image);
-            travel.setImagePath(imagePath);
-        }
+        // Save the image to disk and set the path in the travel object
         travelService.saveTravel(travel);
         return "redirect:/travel/all";
     }
@@ -61,14 +55,11 @@ public class TravelController {
     }
 
     @PostMapping("/edit")
-    public String editTravel(@ModelAttribute("travel") Travel travel, BindingResult result, @RequestParam("image") MultipartFile image) throws IOException {
+    public String editTravel(@ModelAttribute("travel") Travel travel, BindingResult result, @RequestParam("image") MultipartFile image) {
         if (result.hasErrors()) {
             return "edit-travel";
         }
-        if (!image.isEmpty()) {
-            String imagePath = travelService.saveImage(image);
-            travel.setImagePath(imagePath);
-        }
+        // Save the updated image to disk and set the path in the travel object
         travelService.saveTravel(travel);
         return "redirect:/travel/all";
     }
@@ -77,29 +68,5 @@ public class TravelController {
     public String deleteTravel(@PathVariable("id") int id) {
         travelService.deleteTravel(id);
         return "redirect:/travel/all";
-    }
-
-    @GetMapping("/reserve/{id}")
-    public String showReserveTravelForm(@PathVariable("id") int id, Model model) {
-        Travel travel = travelService.getTravelById(id);
-        Reservation reservation = new Reservation();
-        reservation.setTravel(travel);
-        model.addAttribute("reservation", reservation);
-        return "reserve-travel";
-    }
-
-    @PostMapping("/reserve")
-    public String reserveTravel(@ModelAttribute("reservation") Reservation reservation, BindingResult result) {
-        if (result.hasErrors()) {
-            return "reserve-travel";
-        }
-        reservationService.saveReservation(reservation);
-        return "redirect:/travel/all";
-    }
-
-    @GetMapping("/cancel-reservation/{id}")
-    public String cancelReservation(@PathVariable("id") int id) {
-        reservationService.cancelReservation(id);
-        return "redirect:/user/profile";
     }
 }
