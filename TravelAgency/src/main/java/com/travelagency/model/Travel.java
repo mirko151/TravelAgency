@@ -37,6 +37,11 @@ public class Travel {
     private int totalSeats;
     private int availableSeats;
 
+    private BigDecimal discountPercentage;
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date discountExpirationDate;
+
     // Getters and Setters
     public int getId() {
         return id;
@@ -132,5 +137,29 @@ public class Travel {
 
     public void setAvailableSeats(int availableSeats) {
         this.availableSeats = availableSeats;
+    }
+
+    public BigDecimal getDiscountPercentage() {
+        return discountPercentage;
+    }
+
+    public void setDiscountPercentage(BigDecimal discountPercentage) {
+        this.discountPercentage = discountPercentage;
+    }
+
+    public Date getDiscountExpirationDate() {
+        return discountExpirationDate;
+    }
+
+    public void setDiscountExpirationDate(Date discountExpirationDate) {
+        this.discountExpirationDate = discountExpirationDate;
+    }
+
+    // Metod za vraćanje trenutne cene
+    public BigDecimal getCurrentPrice() {
+        if (discountPercentage != null && discountExpirationDate != null && discountExpirationDate.after(new Date())) {
+            return price.subtract(price.multiply(discountPercentage.divide(new BigDecimal("100"))));
+        }
+        return price;
     }
 }

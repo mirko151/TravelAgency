@@ -11,6 +11,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -40,8 +42,12 @@ public class TravelController {
         if (result.hasErrors()) {
             return "add-travel";
         }
-        // Save the image to disk and set the path in the travel object
-        travelService.saveTravel(travel);
+        try {
+            travelService.saveTravel(travel, image);
+        } catch (IOException e) {
+            e.printStackTrace(); // Dodati bolju obradu greške
+            return "add-travel";
+        }
         return "redirect:/travel/all";
     }
 
@@ -59,8 +65,12 @@ public class TravelController {
         if (result.hasErrors()) {
             return "edit-travel";
         }
-        // Save the updated image to disk and set the path in the travel object
-        travelService.saveTravel(travel);
+        try {
+            travelService.saveTravel(travel, image);
+        } catch (IOException e) {
+            e.printStackTrace(); // Dodati bolju obradu greške
+            return "edit-travel";
+        }
         return "redirect:/travel/all";
     }
 
@@ -68,5 +78,16 @@ public class TravelController {
     public String deleteTravel(@PathVariable("id") int id) {
         travelService.deleteTravel(id);
         return "redirect:/travel/all";
+    }
+
+    @GetMapping("/search")
+    public String searchTravels(@RequestParam(required = false) TransportMode transportMode,
+                                @RequestParam(required = false) BigDecimal minPrice,
+                                @RequestParam(required = false) BigDecimal maxPrice,
+                                @RequestParam(required = false) Integer nights,
+                                Model model) {
+        List<Travel> travels = travelService.searchTravels(transportMode, minPrice, maxPrice, nights);
+        model.addAttribute("travels", travels);
+        return "travels";
     }
 }
