@@ -5,6 +5,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "travel_categories")
 public class TravelCategory {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -13,6 +14,9 @@ public class TravelCategory {
     private String name;
 
     private String description;
+
+    // Constructors
+    public TravelCategory() {}
 
     // Getters and Setters
     public int getId() {

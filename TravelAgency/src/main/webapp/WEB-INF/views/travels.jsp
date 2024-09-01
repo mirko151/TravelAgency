@@ -3,29 +3,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Travels</title>
+    <title>Putovanja</title>
 </head>
 <body>
-    <h2>Available Travels</h2>
-    <table>
-        <tr>
-            <th>Destination</th>
-            <th>Price</th>
-            <th>Available Seats</th>
-            <th>Actions</th>
-        </tr>
-        <c:forEach var="travel" items="${travels}">
+    <h2>Putovanja</h2>
+    <table border="1">
+        <thead>
             <tr>
-                <td>${travel.destinationName}</td>
-                <td>${travel.currentPrice}</td>
-                <td>${travel.availableSeats}</td>
-                <td>
-                    <a href="${pageContext.request.contextPath}/travel/edit/${travel.id}">Edit</a>
-                    <a href="${pageContext.request.contextPath}/travel/delete/${travel.id}">Delete</a>
-                </td>
+                <th>Destinacija</th>
+                <th>Prevoz</th>
+                <th>Smeštaj</th>
+                <th>Datum polaska</th>
+                <th>Cena</th>
+                <th>Akcija</th>
             </tr>
-        </c:forEach>
+        </thead>
+        <tbody>
+            <c:forEach var="travel" items="${travels}">
+                <tr>
+                    <td>${travel.destinationName}</td>
+                    <td>${travel.transportMode}</td>
+                    <td>${travel.accommodation}</td>
+                    <td>${travel.departureDate}</td>
+                    <td>${travel.price}</td>
+                    <td><a href="${pageContext.request.contextPath}/reservation/create/${travel.id}">Rezerviši</a></td>
+                </tr>
+            </c:forEach>
+        </tbody>
     </table>
-    <a href="${pageContext.request.contextPath}/travel/add">Add New Travel</a>
 </body>
 </html>

@@ -3,22 +3,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Prijava</title>
 </head>
 <body>
-    <h2>Login</h2>
+    <h2>Prijava</h2>
     <form action="${pageContext.request.contextPath}/user/login" method="post">
         <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <c:if test="${not empty error}">
-            <p style="color:red;">${error}</p>
-        </c:if>
-        <button type="submit">Login</button>
+        <input type="text" id="email" name="email" required><br>
+        <label for="password">Lozinka:</label>
+        <input type="password" id="password" name="password" required><br>
+        <button type="submit">Prijavi se</button>
     </form>
-    <a href="${pageContext.request.contextPath}/user/register">Register</a>
+    <c:if test="${not empty error}">
+        <p style="color:red;">${error}</p>
+    </c:if>
 </body>
 </html>

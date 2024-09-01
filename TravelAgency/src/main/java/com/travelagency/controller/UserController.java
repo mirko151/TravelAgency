@@ -5,6 +5,7 @@ import com.travelagency.model.Reservation;
 import com.travelagency.service.UserService;
 import com.travelagency.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user")
@@ -23,6 +27,9 @@ public class UserController {
 
     @Autowired
     private ReservationService reservationService;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
@@ -41,8 +48,20 @@ public class UserController {
             return "register";
         }
 
+        // Password complexity validation
+        if (!isPasswordComplex(user.getPassword())) {
+            model.addAttribute("error", "Lozinka mora imati najmanje 8 karaktera, uključujući jedno veliko slovo i jedan broj.");
+            return "register";
+        }
+
         userService.saveUser(user);
         return "redirect:/user/login";
+    }
+
+    private boolean isPasswordComplex(String password) {
+        return password.length() >= 8 &&
+               Pattern.compile("[A-Z]").matcher(password).find() &&
+               Pattern.compile("[0-9]").matcher(password).find();
     }
 
     @GetMapping("/login")
@@ -55,7 +74,7 @@ public class UserController {
                             @RequestParam("password") String password, 
                             Model model, HttpSession session) {
         User user = userService.getUserByEmail(email);
-        if (user == null || !user.getPassword().equals(password)) {
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             model.addAttribute("error", "Neispravan email ili lozinka");
             return "login";
         }
@@ -114,7 +133,7 @@ public class UserController {
             return "redirect:/user/login";
         }
 
-        if (!loggedUser.getPassword().equals(oldPassword)) {
+        if (!passwordEncoder.matches(oldPassword, loggedUser.getPassword())) {
             model.addAttribute("error", "Stara lozinka nije ispravna.");
             return "profile";
         }
@@ -124,7 +143,7 @@ public class UserController {
             return "profile";
         }
 
-        loggedUser.setPassword(newPassword);
+        loggedUser.setPassword(passwordEncoder.encode(newPassword));
         userService.saveUser(loggedUser);
         
         model.addAttribute("success", "Lozinka je uspešno promenjena.");
@@ -146,7 +165,23 @@ public class UserController {
         }
 
         List<Reservation> reservations = reservationService.getReservationsByUser(loggedUser.getId());
-        model.addAttribute("reservations", reservations);
+
+        List<Reservation> pastReservations = reservations.stream()
+                .filter(r -> r.getTravel().getDepartureDate().before(new Date()))
+                .collect(Collectors.toList());
+
+        List<Reservation> upcomingReservations = reservations.stream()
+                .filter(r -> r.getTravel().getDepartureDate().after(new Date()))
+                .collect(Collectors.toList());
+
+        model.addAttribute("pastReservations", pastReservations);
+        model.addAttribute("upcomingReservations", upcomingReservations);
         return "reservations";
+    }
+
+    @PostMapping("/profile/cancel-reservation/{id}")
+    public String cancelReservation(@PathVariable("id") Long reservationId) {
+        reservationService.cancelReservation(reservationId);
+        return "redirect:/user/profile/reservations";
     }
 }

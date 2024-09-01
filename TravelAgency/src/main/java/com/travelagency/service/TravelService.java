@@ -1,16 +1,14 @@
 package com.travelagency.service;
 
-import com.travelagency.model.Travel;
 import com.travelagency.model.TransportMode;
+import com.travelagency.model.Travel;
 import com.travelagency.repository.TravelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -28,16 +26,37 @@ public class TravelService {
     @Autowired
     private TravelRepository travelRepository;
 
-    public Travel saveTravel(Travel travel) {
+    @Autowired
+    private ReservationService reservationService;
+
+    @Autowired
+    private AuditService auditService;
+
+    public Travel saveTravel(Travel travel, String managerEmail) {
+        auditService.logActivity("Manager " + managerEmail + " created/updated travel: " + travel.getDestinationName());
         return travelRepository.save(travel);
     }
 
-    public Travel saveTravel(Travel travel, MultipartFile image) throws IOException {
+    public Travel saveTravel(Travel travel, MultipartFile image, String managerEmail) throws IOException {
         if (image != null && !image.isEmpty()) {
             String imagePath = saveImage(image);
             travel.setImagePath(imagePath);
         }
+
+        if (travel.getDiscountValidUntil() != null && travel.getDiscountValidUntil().before(new Date())) {
+            travel.setDiscountPrice(null);
+            travel.setDiscountValidUntil(null);
+        }
+
+        auditService.logActivity("Manager " + managerEmail + " created/updated travel: " + travel.getDestinationName());
         return travelRepository.save(travel);
+    }
+
+    private String saveImage(MultipartFile image) throws IOException {
+        String uniqueFileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
+        Path path = Paths.get(UPLOAD_DIR + uniqueFileName);
+        Files.write(path, image.getBytes());
+        return path.toString();
     }
 
     public Travel getTravelById(int id) {
@@ -48,47 +67,23 @@ public class TravelService {
         return travelRepository.findAll();
     }
 
-    public void deleteTravel(int id) {
-        travelRepository.deleteById(id);
+    public void deleteTravel(int id, String managerEmail) {
+        Travel travel = travelRepository.findById(id).orElse(null);
+        if (travel != null && reservationService.findByTravelId((long) travel.getId()).isEmpty()) {
+            travelRepository.deleteById(id);
+            auditService.logActivity("Manager " + managerEmail + " deleted travel: " + travel.getDestinationName());
+        }
     }
 
-    public String saveImage(MultipartFile image) throws IOException {
-        String uniqueFileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
-        Path path = Paths.get(UPLOAD_DIR + uniqueFileName);
-        Files.write(path, image.getBytes());
-        return path.toString();
+    public List<Travel> getActiveDiscountTravels() {
+        return travelRepository.findActiveDiscountTravels(new Date());
     }
 
-    public List<Travel> searchTravels(TransportMode transportMode, BigDecimal minPrice, BigDecimal maxPrice, Integer nights) {
-        Specification<Travel> spec = Specification.where(null);
-
-        if (transportMode != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("transportMode"), transportMode));
-        }
-        if (minPrice != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
-        }
-        if (maxPrice != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
-        }
-        if (nights != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("nights"), nights));
-        }
-
-        return travelRepository.findAll(spec);
+    public List<Travel> getSeasonalTravels(String season) {
+        return travelRepository.findSeasonalTravels(season);
     }
 
-    public List<Travel> getActiveDiscountedTravels() {
-        return travelRepository.findAll((root, query, criteriaBuilder) -> 
-            criteriaBuilder.and(
-                criteriaBuilder.isNotNull(root.get("discountPercentage")),
-                criteriaBuilder.greaterThan(root.get("discountExpirationDate"), new Date())
-            )
-        );
-    }
-
-    public List<Travel> getRandomTravelsBySeason(int count, String season) {
-        Pageable pageable = PageRequest.of(0, count);
-        return travelRepository.findByCategoryName(season, pageable);
+    public Page<Travel> searchTravels(TransportMode transportMode, BigDecimal minPrice, BigDecimal maxPrice, Integer nights, Pageable pageable) {
+        return travelRepository.findTravelsByCriteria(transportMode, minPrice, maxPrice, nights, pageable);
     }
 }

@@ -6,29 +6,37 @@ import java.util.Date;
 @Entity
 @Table(name = "reservations")
 public class Reservation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "travel_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "travel_id", nullable = false)
     private Travel travel;
 
-    private int passengers;
+    @Column(nullable = false)
+    private int numberOfTravelers;
 
+    @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date reservationDate = new Date();
+    private Date reservationDate;
+
+    // Constructors
+    public Reservation() {
+        this.reservationDate = new Date();
+    }
 
     // Getters and Setters
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -48,12 +56,12 @@ public class Reservation {
         this.travel = travel;
     }
 
-    public int getPassengers() {
-        return passengers;
+    public int getNumberOfTravelers() {
+        return numberOfTravelers;
     }
 
-    public void setPassengers(int passengers) {
-        this.passengers = passengers;
+    public void setNumberOfTravelers(int numberOfTravelers) {
+        this.numberOfTravelers = numberOfTravelers;
     }
 
     public Date getReservationDate() {

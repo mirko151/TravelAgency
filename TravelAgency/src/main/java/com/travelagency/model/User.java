@@ -6,6 +6,7 @@ import java.util.Date;
 @Entity
 @Table(name = "users")
 public class User {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -22,7 +23,9 @@ public class User {
     @Column(nullable = false)
     private String lastName;
 
+    @Temporal(TemporalType.DATE)
     private Date dateOfBirth;
+
     private String jmbg;
     private String address;
     private String phoneNumber;
@@ -33,6 +36,9 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.CUSTOMER;
+
+    // Constructors
+    public User() {}
 
     // Getters and Setters
     public int getId() {
@@ -111,10 +117,6 @@ public class User {
         return registrationDate;
     }
 
-    public void setRegistrationDate(Date registrationDate) {
-        this.registrationDate = registrationDate;
-    }
-
     public Role getRole() {
         return role;
     }
@@ -123,5 +125,3 @@ public class User {
         this.role = role;
     }
 }
-
-
