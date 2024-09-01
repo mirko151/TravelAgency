@@ -7,7 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 
 @Controller
@@ -29,11 +30,12 @@ public class HomeController {
     }
 
     private String getSeason() {
-        Date date = new Date();
-        int month = date.getMonth();
-        if (month >= 5 && month <= 8) {
+        LocalDate date = LocalDate.now(); 
+        Month month = date.getMonth();
+
+        if (month.getValue() >= 5 && month.getValue() <= 8) {
             return "Letovanje";
-        } else if (month == 11 || month <= 2) {
+        } else if (month == Month.NOVEMBER || month.getValue() <= 2) {
             return "Zimovanje";
         } else {
             return "Van sezonska ponuda";
