@@ -1,6 +1,7 @@
 /Users/mirkopopovic/eclipse-workspace/TravelAgency/TravelAgency/src/main/java/com/travelagency/model/TravelCategory.java
 /Users/mirkopopovic/eclipse-workspace/TravelAgency/TravelAgency/src/main/java/com/travelagency/model/Role.java
 /Users/mirkopopovic/eclipse-workspace/TravelAgency/TravelAgency/src/main/java/com/travelagency/model/Reservation.java
+/Users/mirkopopovic/eclipse-workspace/TravelAgency/TravelAgency/src/main/java/com/travelagency/TravelAgencyApplication.java
 /Users/mirkopopovic/eclipse-workspace/TravelAgency/TravelAgency/src/main/java/com/travelagency/model/Accommodation.java
 /Users/mirkopopovic/eclipse-workspace/TravelAgency/TravelAgency/src/main/java/com/travelagency/controller/UserController.java
 /Users/mirkopopovic/eclipse-workspace/TravelAgency/TravelAgency/src/main/java/com/travelagency/service/TravelService.java

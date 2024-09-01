@@ -1,4 +1,5 @@
 com/travelagency/controller/UserController.class
+com/travelagency/TravelAgencyApplication.class
 com/travelagency/repository/ReservationRepository.class
 com/travelagency/model/TransportMode.class
 com/travelagency/model/User.class
